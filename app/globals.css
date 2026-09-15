@@ -28,14 +28,6 @@ body {
   line-height: 1.5;
 }
 
-body.has-custom-cursor {
-  cursor: none;
-}
-
-body.has-custom-cursor * {
-  cursor: none;
-}
-
 .section-shell {
   opacity: 1;
   transform: translateY(0);
@@ -735,20 +727,10 @@ main.page-shell {
   overflow: hidden;
 }
 
-.pixel-cursor-pointer,
 .pixel-cursor-particle {
   position: fixed;
   display: block;
   pointer-events: none;
-  transform: translate3d(-100px, -100px, 0);
-}
-
-.pixel-cursor-pointer {
-  width: 4px;
-  height: 4px;
-  z-index: 2;
-  background: #ff2b1a;
-  will-change: transform;
 }
 
 .pixel-cursor-particle {
