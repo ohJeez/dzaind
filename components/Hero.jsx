@@ -31,6 +31,7 @@ export default function Hero() {
     let resizeTimer;
     let cancelled = false;
     let removeLayoutListeners = () => {};
+    let loadingObserver;
 
     const ctx = gsap.context(() => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -100,6 +101,29 @@ export default function Hero() {
       gsap.set(navLogo, { opacity: 0 });
       gsap.set(navLinks, { x: 0, opacity: 0 });
       gsap.set([taglineLeft, taglineRight], { x: 0, opacity: 0 });
+
+      const playLogoEntrance = () => {
+        if (cancelled) return;
+        gsap.fromTo(
+          logo,
+          { scale: 1.15, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out", overwrite: false }
+        );
+      };
+
+      const loadingScreen = document.querySelector(".loading-screen");
+      if (loadingScreen) {
+        gsap.set(logo, { scale: 1.15, opacity: 0 });
+        loadingObserver = new MutationObserver(() => {
+          if (!document.querySelector(".loading-screen")) {
+            loadingObserver.disconnect();
+            playLogoEntrance();
+          }
+        });
+        loadingObserver.observe(document.body, { childList: true, subtree: true });
+      } else {
+        playLogoEntrance();
+      }
 
       tl.to(
         scrollIndicator,
@@ -199,6 +223,7 @@ export default function Hero() {
 
       removeLayoutListeners = () => {
         cancelled = true;
+        loadingObserver?.disconnect();
         window.clearTimeout(resizeTimer);
         window.removeEventListener("resize", refreshTarget);
         window.removeEventListener("orientationchange", refreshTarget);
