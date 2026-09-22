@@ -4,7 +4,6 @@ import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import PixelWave from "./PixelWave";
-import { q } from "framer-motion/client";
 
 gsap.registerPlugin(ScrollTrigger);
 

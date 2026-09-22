@@ -143,6 +143,7 @@ export default function Work() {
                   muted
                   loop
                   playsInline
+                  preload="metadata"
                   aria-label={`${project.title} project preview`}
                 />
               ) : project.image ? (

@@ -18,14 +18,20 @@ export default function PixelCursor() {
     }
 
     const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+
     const context = canvas.getContext("2d");
+    if (!context) return undefined;
+
     const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     const current = { ...target };
     const lastSpawn = { ...target };
     const particles = [];
+
     let hover = false;
-    let frame;
+    let frame = 0;
     let lastTime = performance.now();
+    let isPageVisible = !document.hidden;
 
     const resize = () => {
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -60,33 +66,62 @@ export default function PixelCursor() {
       hover = false;
     };
 
+    const handleVisibilityChange = () => {
+      isPageVisible = !document.hidden;
+
+      if (!isPageVisible) {
+        particles.length = 0;
+        context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      } else {
+        lastTime = performance.now();
+      }
+    };
+
     const animate = (now) => {
+      if (!isPageVisible) {
+        frame = requestAnimationFrame(animate);
+        return;
+      }
+
       const delta = Math.min(2, (now - lastTime) / 16.67);
       lastTime = now;
+
       current.x += (target.x - current.x) * 0.24;
       current.y += (target.y - current.y) * 0.24;
 
       const distance = Math.hypot(current.x - lastSpawn.x, current.y - lastSpawn.y);
       if (distance >= SPAWN_DISTANCE) {
-        spawn(hover ? 2 + Math.floor(Math.random() * 2) : 1 + Math.floor(Math.random() * 2), now);
+        spawn(
+          hover ? 2 + Math.floor(Math.random() * 2) : 1 + Math.floor(Math.random() * 2),
+          now
+        );
         lastSpawn.x = current.x;
         lastSpawn.y = current.y;
       }
 
       context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
       for (let index = particles.length - 1; index >= 0; index -= 1) {
         const particle = particles[index];
         const progress = (now - particle.born) / particle.life;
+
         if (progress >= 1) {
           particles.splice(index, 1);
           continue;
         }
+
         particle.x += particle.velocityX * delta;
         particle.y += particle.velocityY * delta;
+
         const fade = 1 - progress;
         context.globalAlpha = fade * fade * 0.65;
         context.fillStyle = "#ff2a2a";
-        context.fillRect(particle.x - particle.size / 2, particle.y - particle.size / 2, particle.size, particle.size);
+        context.fillRect(
+          particle.x - particle.size / 2,
+          particle.y - particle.size / 2,
+          particle.size,
+          particle.size
+        );
       }
 
       context.globalAlpha = hover ? 0.9 : 0.68;
@@ -95,17 +130,22 @@ export default function PixelCursor() {
       context.beginPath();
       context.arc(current.x, current.y, hover ? 14 : 10, 0, Math.PI * 2);
       context.stroke();
+
       context.globalAlpha = 1;
       context.fillStyle = "#ff2a2a";
       context.fillRect(current.x - 2, current.y - 2, 4, 4);
+
       frame = requestAnimationFrame(animate);
     };
 
     resize();
     document.body.classList.add("has-custom-cursor");
+
     window.addEventListener("resize", resize);
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
     window.addEventListener("pointerleave", handlePointerLeave);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     frame = requestAnimationFrame(animate);
 
     return () => {
@@ -113,6 +153,7 @@ export default function PixelCursor() {
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerleave", handlePointerLeave);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       cancelAnimationFrame(frame);
       particles.length = 0;
     };

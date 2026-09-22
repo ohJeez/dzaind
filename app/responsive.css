@@ -1,0 +1,431 @@
+/*
+ * DZAIND — Responsive polish layer
+ *
+ * Import this AFTER globals.css:
+ * import "./responsive.css";
+ *
+ * This file only adds responsive overrides. It does not replace the
+ * existing desktop styling or animation logic.
+ */
+
+/* ---------- Large tablets / small laptops ---------- */
+@media (max-width: 1100px) {
+  .navbar {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .nav-links {
+    gap: 1.35rem;
+  }
+
+  .about-section,
+  .work-section,
+  .services-section,
+  .experimental-section,
+  .contact-section,
+  .site-footer {
+    padding-left: 6vw;
+    padding-right: 6vw;
+  }
+
+  .about-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(220px, 0.7fr);
+    gap: 2rem;
+  }
+
+  .project-card {
+    width: min(31rem, 72vw);
+  }
+}
+
+/* ---------- Tablets ---------- */
+@media (max-width: 900px) {
+  .navbar {
+    padding: 1rem 1.25rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+  }
+
+  .nav-links a {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+  }
+
+  .hero-content {
+    padding: 0 1.25rem;
+  }
+
+  .hero-logo {
+    max-width: 90vw;
+  }
+
+  .about-section,
+  .work-section,
+  .services-section,
+  .experimental-section,
+  .contact-section,
+  .site-footer {
+    padding-top: 5.5rem;
+    padding-bottom: 5.5rem;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .about-section h2 {
+    max-width: 10ch;
+  }
+
+  .about-section p {
+    max-width: 42rem;
+  }
+
+  .experimental-panel {
+    min-height: 26rem;
+  }
+
+  .site-footer {
+    align-items: flex-start;
+  }
+}
+
+/* ---------- Phones / portrait ---------- */
+@media (max-width: 768px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .navbar {
+    padding: 0.9rem 1rem;
+  }
+
+  .nav-logo {
+    font-size: 1.15rem;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: inline-grid;
+  }
+
+  .mobile-menu {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .mobile-menu-panel {
+    gap: 1.5rem;
+    padding: 5rem 1.5rem;
+  }
+
+  .hero {
+    min-height: 100svh;
+    height: 100svh;
+  }
+
+  .hero-content {
+    min-height: 100svh;
+    padding: 0 1rem;
+  }
+
+  .hero-logo {
+    width: 100%;
+    max-width: 92vw;
+    font-size: clamp(62px, 19vw, 150px);
+    line-height: 0.8;
+  }
+
+  .hero-wordmark {
+    gap: 0.065em;
+  }
+
+  .wm-dot {
+    flex-shrink: 0;
+  }
+
+  .hero-tagline {
+    width: auto;
+    max-width: calc(100vw - 2rem);
+    font-size: clamp(34px, 10.5vw, 70px);
+    line-height: 0.94;
+    text-align: center;
+  }
+
+  .scroll-indicator {
+    left: 1rem;
+    bottom: 1rem;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+
+  /*
+   * The desktop Work section uses horizontal pinning.
+   * On mobile, normal vertical scrolling is easier to use and prevents
+   * very long horizontal scroll distances.
+   */
+  .work-section {
+    overflow: visible;
+  }
+
+  .work-track {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .project-card {
+    width: 100%;
+    height: min(34rem, 82svh);
+    min-height: 27rem;
+    padding: 1rem;
+  }
+
+  .project-meta {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  .project-visual {
+    height: 66%;
+  }
+
+  .project-copy h3 {
+    font-size: clamp(2rem, 10vw, 3.6rem);
+  }
+
+  .about-section,
+  .work-section,
+  .services-section,
+  .experimental-section,
+  .contact-section,
+  .site-footer {
+    padding: 4.75rem 1.1rem;
+  }
+
+  .section-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.24em;
+    margin-bottom: 1rem;
+  }
+
+  .about-section h2 {
+    max-width: 100%;
+    font-size: clamp(3rem, 13vw, 5.5rem);
+  }
+
+  .about-section p {
+    max-width: 100%;
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .services-section h2 {
+    font-size: clamp(3rem, 14vw, 6rem);
+  }
+
+  .service-item {
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    gap: 0.7rem;
+    padding: 1.2rem 0;
+  }
+
+  .service-index {
+    font-size: 0.65rem;
+  }
+
+  .service-name {
+    font-size: clamp(1.5rem, 7.5vw, 3rem);
+  }
+
+  .service-accent {
+    width: 36px;
+  }
+
+  .experimental-panel {
+    min-height: 24rem;
+  }
+
+  .experimental-copy {
+    width: calc(100% - 2rem);
+  }
+
+  .experimental-copy h3 {
+    font-size: clamp(2rem, 9vw, 4rem);
+  }
+
+  .orb-one {
+    width: 16rem;
+    height: 16rem;
+    left: -4rem;
+    top: 10%;
+  }
+
+  .orb-two {
+    width: 12rem;
+    height: 12rem;
+    right: -3rem;
+    bottom: 5%;
+  }
+
+  .orb-three {
+    width: 8rem;
+    height: 8rem;
+    left: 40%;
+    bottom: 18%;
+  }
+
+  .contact-section h2 {
+    max-width: 100%;
+    font-size: clamp(3.5rem, 15vw, 7rem);
+  }
+
+  .cta-link {
+    width: 100%;
+    max-width: 22rem;
+    margin-top: 2rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .site-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .footer-links {
+    gap: 1rem 1.25rem;
+  }
+
+  .page-transition-content {
+    width: min(90vw, 30rem);
+    text-align: center;
+  }
+
+  .transition-label {
+    font-size: clamp(2.5rem, 13vw, 5rem);
+  }
+
+  .cursor-canvas {
+    display: none;
+  }
+}
+
+/* ---------- Small phones ---------- */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.8rem 0.85rem;
+  }
+
+  .menu-toggle {
+    width: 42px;
+    height: 42px;
+  }
+
+  .hero-logo {
+    max-width: 94vw;
+    font-size: clamp(52px, 18vw, 105px);
+  }
+
+  .hero-tagline {
+    max-width: calc(100vw - 1.5rem);
+    font-size: clamp(30px, 10.5vw, 52px);
+  }
+
+  .about-section,
+  .work-section,
+  .services-section,
+  .experimental-section,
+  .contact-section,
+  .site-footer {
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
+
+  .project-card {
+    min-height: 25rem;
+    height: 78svh;
+    padding: 0.85rem;
+  }
+
+  .project-visual {
+    height: 62%;
+  }
+
+  .service-item {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+
+  .service-accent {
+    display: none;
+  }
+
+  .experimental-panel {
+    min-height: 21rem;
+  }
+
+  .contact-section h2 {
+    font-size: clamp(3rem, 15vw, 5rem);
+  }
+
+  .footer-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+}
+
+/* ---------- Landscape phones ---------- */
+@media (max-width: 900px) and (orientation: landscape) {
+  .hero,
+  .hero-content {
+    min-height: 100svh;
+    height: 100svh;
+  }
+
+  .hero-logo {
+    font-size: clamp(54px, 13vw, 110px);
+  }
+
+  .hero-tagline {
+    font-size: clamp(24px, 5vw, 44px);
+  }
+
+  .scroll-indicator {
+    bottom: 0.7rem;
+  }
+
+  .mobile-menu-panel {
+    gap: 0.8rem;
+    font-size: clamp(1.3rem, 5vw, 2.2rem);
+  }
+}
+
+/* ---------- Accessibility / motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .project-card,
+  .project-visual,
+  .nav-links a,
+  .cta-link,
+  .service-accent {
+    transition: none !important;
+  }
+
+  .loading-line::after {
+    animation: none;
+  }
+}

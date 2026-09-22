@@ -6,15 +6,32 @@ import { useEffect, useRef, useState } from "react";
 export default function PageTransition() {
   const [active, setActive] = useState(false);
   const [label, setLabel] = useState("DZAIND");
-  const [isLocked, setIsLocked] = useState(false);
   const activeRef = useRef(false);
+  const timersRef = useRef(new Set());
 
   useEffect(() => {
+    const addTimer = (callback, delay) => {
+      const timer = window.setTimeout(() => {
+        timersRef.current.delete(timer);
+        callback();
+      }, delay);
+
+      timersRef.current.add(timer);
+      return timer;
+    };
+
+    const clearTimers = () => {
+      timersRef.current.forEach((timer) => window.clearTimeout(timer));
+      timersRef.current.clear();
+    };
+
     const triggerTransition = (target, nextLabel) => {
-      if (isLocked || !target || activeRef.current) return;
+      if (activeRef.current || !target) return;
 
       const selector = target.startsWith("#") ? target.slice(1) : target;
-      const element = document.getElementById(selector) || document.querySelector(`[data-section="${selector}"]`);
+      const element =
+        document.getElementById(selector) ||
+        document.querySelector(`[data-section="${selector}"]`);
 
       if (!element) {
         console.warn(`[DZAIND] Navigation target not found: ${target}`);
@@ -22,7 +39,6 @@ export default function PageTransition() {
       }
 
       activeRef.current = true;
-      setIsLocked(true);
       setLabel(nextLabel || selector.toUpperCase());
       setActive(true);
 
@@ -30,9 +46,8 @@ export default function PageTransition() {
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       const unlock = () => {
-        setActive(false);
         activeRef.current = false;
-        setIsLocked(false);
+        setActive(false);
         if (lenis) lenis.start();
       };
 
@@ -42,20 +57,28 @@ export default function PageTransition() {
         return;
       }
 
+      if (lenis) lenis.start();
+
       window.requestAnimationFrame(() => {
-        const offsetTop = element.getBoundingClientRect().top + (window.scrollY || 0) - 86;
+        const navbar = document.querySelector("[data-navbar]");
+        const offset = navbar
+          ? Math.max(0, navbar.getBoundingClientRect().height + 12)
+          : 86;
+        const offsetTop =
+          element.getBoundingClientRect().top + (window.scrollY || 0) - offset;
 
         if (lenis) {
-          lenis.start();
-          lenis.scrollTo(offsetTop, { duration: 0.9, immediate: false });
+          lenis.scrollTo(offsetTop, {
+            duration: 0.9,
+            immediate: false,
+          });
         } else {
           window.scrollTo({ top: offsetTop, behavior: "smooth" });
         }
       });
 
-      const revealTimer = window.setTimeout(() => {
-        const allSections = document.querySelectorAll("[data-section]");
-        allSections.forEach((section) => {
+      addTimer(() => {
+        document.querySelectorAll("[data-section]").forEach((section) => {
           section.classList.remove("is-visible");
           section.classList.remove("section-loaded");
         });
@@ -63,14 +86,12 @@ export default function PageTransition() {
         element.classList.add("is-visible");
         element.classList.add("section-loaded");
 
-        window.setTimeout(unlock, 500);
+        addTimer(unlock, 500);
       }, 260);
 
-      window.setTimeout(() => {
+      addTimer(() => {
         if (activeRef.current) unlock();
       }, 2200);
-
-      return () => window.clearTimeout(revealTimer);
     };
 
     const handleNavigate = (event) => {
@@ -90,6 +111,7 @@ export default function PageTransition() {
       if (!section) return;
 
       event.preventDefault();
+
       window.dispatchEvent(
         new CustomEvent("dzaind:navigate", {
           detail: { target: section, label: section.toUpperCase() },
@@ -99,8 +121,8 @@ export default function PageTransition() {
 
     window.addEventListener("dzaind:navigate", handleNavigate);
 
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-      anchor.removeEventListener("click", handleAnchorClick);
+    const anchors = document.querySelectorAll('a[href^="#"]');
+    anchors.forEach((anchor) => {
       anchor.addEventListener("click", handleAnchorClick);
     });
 
@@ -109,12 +131,17 @@ export default function PageTransition() {
     };
 
     return () => {
+      clearTimers();
       window.removeEventListener("dzaind:navigate", handleNavigate);
-      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+
+      anchors.forEach((anchor) => {
         anchor.removeEventListener("click", handleAnchorClick);
       });
+
+      delete window.dzaindNavigate;
+      activeRef.current = false;
     };
-  }, [isLocked]);
+  }, []);
 
   return (
     <AnimatePresence>
@@ -123,16 +150,17 @@ export default function PageTransition() {
           className="page-transition-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.45, ease: "easeInOut" } }}
-          transition={{ duration: 0.22, ease: "easeOut" }}
+          exit={{ opacity: 0, transition: { duration: 0.38, ease: "easeInOut" } }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           aria-live="polite"
+          role="status"
         >
           <motion.div
             className="page-transition-content"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -12, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            initial={{ y: 18, opacity: 0, scale: 0.985 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: -10, opacity: 0, scale: 0.99 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           >
             <span className="transition-brand">DZAIND</span>
             <span className="transition-label">{label}</span>

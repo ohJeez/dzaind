@@ -929,3 +929,78 @@ main.page-shell {
     scroll-behavior: auto !important;
   }
 }
+
+
+/* Final interaction and rendering polish */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior-x: none;
+}
+
+body {
+  min-height: 100vh;
+  font-synthesis: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.has-custom-cursor,
+body.has-custom-cursor * {
+  cursor: none !important;
+}
+
+.cursor-canvas {
+  contain: strict;
+  will-change: contents;
+}
+
+.page-transition-overlay {
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  backface-visibility: hidden;
+}
+
+.page-transition-content,
+.pixel-wave,
+.hero-logo,
+.hero-tagline {
+  backface-visibility: hidden;
+}
+
+.navbar,
+.project-card,
+.service-item,
+.cta-link,
+.footer-links a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.project-card {
+  will-change: transform;
+}
+
+.project-media {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .project-card:hover .project-media {
+    will-change: transform;
+  }
+}
+
+@media (max-width: 768px) {
+  .cursor-canvas {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.has-custom-cursor,
+  body.has-custom-cursor * {
+    cursor: auto !important;
+  }
+}

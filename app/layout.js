@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./responsive.css";
 import SmoothScroll from "../components/SmoothScroll";
 
 export const metadata = {
