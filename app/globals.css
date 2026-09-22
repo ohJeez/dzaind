@@ -312,14 +312,38 @@ main.page-shell {
   pointer-events: none;
 }
 
+.pixel-wave {
+  --wave-intensity: 0.7;
+  --wave-density: 0.45;
+  --wave-reveal: 0;
+  --wave-motion: 0;
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  transform-origin: center center;
+  will-change: transform, clip-path, opacity;
+}
+
+.pixel-wave canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  background: transparent;
+}
+
 .hero-logo {
   position: relative;
   z-index: 3;
   font-size: clamp(100px, 18vw, 300px);
-  font-weight: 700;
+  font-family: "Avenir Next Rounded", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  font-weight: 900;
   letter-spacing: -0.08em;
   line-height: 0.78;
-  text-transform: uppercase;
   text-align: center;
   white-space: nowrap;
   transform-origin: center;
@@ -327,19 +351,46 @@ main.page-shell {
   color: #fff;
 }
 
+.hero-wordmark {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.06em;
+}
+
+.wm-left,
+.wm-right {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.wm-dot {
+  display: inline-block;
+  width: 0.18em;
+  height: 0.18em;
+  margin-top: 0.12em;
+  flex: 0 0 auto;
+  background: var(--accent);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
 .hero-tagline {
   position: absolute;
-  left: 50%;
+  left: 50%;   
   top: 50%;
   display: flex;
-  gap: 0.28em;
+  flex-direction: column;
+  gap: 0;
   justify-content: center;
   width: max-content;
-  font-size: clamp(48px, 7vw, 110px);
-  letter-spacing: -0.06em;
+  max-width: 80vw;
+  font-size: clamp(28px, 3.8vw, 58px);
+  letter-spacing: 0;
   line-height: 0.98;
   transform: translate(-50%, -50%);
-  opacity: 1;
+  opacity: 0;
+  color: var(--accent);
   text-transform: uppercase;
   pointer-events: none;
   will-change: transform, opacity;
@@ -717,26 +768,13 @@ main.page-shell {
   color: var(--text);
 }
 
-.pixel-cursor-layer {
+.cursor-canvas {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   z-index: 45;
   pointer-events: none;
-  overflow: hidden;
-}
-
-.pixel-cursor-particle {
-  position: fixed;
-  display: block;
-  pointer-events: none;
-}
-
-.pixel-cursor-particle {
-  z-index: 1;
-  transform-origin: center;
-  will-change: transform, opacity;
 }
 
 .loading-screen {
@@ -822,8 +860,12 @@ main.page-shell {
 
   .hero-logo {
     white-space: normal;
-    max-width: 90vw;
+    max-width: 70vw;
     font-size: clamp(72px, 18vw, 180px);
+  }
+
+  .hero-wordmark {
+    gap: 0.08em;
   }
 
   .hero-tagline {
@@ -832,7 +874,7 @@ main.page-shell {
     bottom: auto;
     max-width: calc(100vw - 2.4rem);
     font-size: clamp(40px, 10vw, 72px);
-    gap: 0.16em;
+    gap: 0;
     white-space: normal;
     text-align: center;
   }

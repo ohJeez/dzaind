@@ -3,230 +3,180 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import PixelWave from "./PixelWave";
+import { q } from "framer-motion/client";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
   const heroRef = useRef(null);
-  const landingReelRef = useRef(null);
-  const videoRef = useRef(null);
-  const logoRef = useRef(null);
+  const waveRef = useRef(null);
+  const waveCanvasRef = useRef(null);
+  const leftRef = useRef(null);
+  const rightRef = useRef(null);
+  const dotRef = useRef(null);
   const taglineRef = useRef(null);
-  const taglineLeftRef = useRef(null);
-  const taglineRightRef = useRef(null);
   const scrollIndicatorRef = useRef(null);
 
   useLayoutEffect(() => {
     const hero = heroRef.current;
-    const landingReel = landingReelRef.current;
-    const video = videoRef.current;
-    const logo = logoRef.current;
+    const wave = waveRef.current;
+    const waveCanvas = waveCanvasRef.current;
+    const left = leftRef.current;
+    const right = rightRef.current;
+    const dot = dotRef.current;
     const tagline = taglineRef.current;
-    const taglineLeft = taglineLeftRef.current;
-    const taglineRight = taglineRightRef.current;
     const scrollIndicator = scrollIndicatorRef.current;
-    const navLogo = document.querySelector("[data-navbar-logo-target]");
     const nav = document.querySelector("[data-navbar]");
+    const navLogo = document.querySelector("[data-navbar-logo-target]");
     const navLinks = document.querySelector("[data-navbar-links]");
     let resizeTimer;
     let cancelled = false;
     let removeLayoutListeners = () => {};
-    let loadingObserver;
 
     const ctx = gsap.context(() => {
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       if (reduceMotion) {
-        gsap.set([landingReel, video, logo, tagline, taglineLeft, taglineRight, scrollIndicator], {
-          clearProps: "all",
-        });
-        gsap.set([tagline, navLogo], { opacity: 1, clearProps: "transform" });
-        gsap.set(navLinks, { x: 0, opacity: 1 });
-        gsap.set(scrollIndicator, { opacity: 1 });
+        gsap.set([left, right, dot], { clearProps: "all" });
+        gsap.set(wave, { opacity: 1, clipPath: "inset(0%)", "--wave-reveal": 1 });
+        gsap.set(waveCanvas, { opacity: 0.7 });
+        gsap.set(tagline, { opacity: 1, clearProps: "transform" });
+        gsap.set([navLogo, navLinks], { opacity: 1, clearProps: "transform" });
         return;
       }
 
-      const target = { x: 0, y: 0, scale: 0.18, linksX: 0 };
-      const measureTarget = () => {
-        const previousReelTransform = landingReel.style.transform;
-        const previousLogoTransform = logo.style.transform;
-        const previousLinksTransform = navLinks?.style.transform || "";
-        landingReel.style.transform = "none";
-        logo.style.transform = "none";
-        if (navLinks) navLinks.style.transform = "none";
-        const logoBounds = logo.getBoundingClientRect();
-        let navBounds;
-
-        if (navLogo) {
-          const previousTransform = navLogo.style.transform;
-          navLogo.style.transform = "none";
-          navBounds = navLogo.getBoundingClientRect();
-          navLogo.style.transform = previousTransform;
-        }
-
-        landingReel.style.transform = previousReelTransform;
-        logo.style.transform = previousLogoTransform;
-        if (navLinks) navLinks.style.transform = previousLinksTransform;
-
-        if (navBounds && logoBounds.width) {
-          target.x = navBounds.left + navBounds.width / 2 - (logoBounds.left + logoBounds.width / 2);
-          target.y = navBounds.top + navBounds.height / 2 - (logoBounds.top + logoBounds.height / 2);
-          target.scale = navBounds.width / logoBounds.width;
-        }
-
-        if (nav && navLinks) {
-          const navRect = nav.getBoundingClientRect();
-          const linksRect = navLinks.getBoundingClientRect();
-          const paddingRight = Number.parseFloat(getComputedStyle(nav).paddingRight) || 0;
-          const finalLeft = navRect.right - paddingRight - linksRect.width;
-          target.linksX = finalLeft - linksRect.left;
-        }
-      };
+      gsap.set([left, right], { x: 0, opacity: 1 });
+      gsap.set(dot, { x: 0, y: 0, scale: 1, opacity: 1 });
+      gsap.set(wave, {
+        opacity: 1,
+        clipPath: "inset(0%)",
+        "--wave-intensity": 0.7,
+        "--wave-density": 0.45,
+        "--wave-reveal": 0,
+        "--wave-motion": 0,
+      });
+      gsap.set(waveCanvas, { opacity: 1 });
+      gsap.set(tagline, { opacity: 0, y: 18, color: "#ffffff" });
+      gsap.set(scrollIndicator, { opacity: 1 });
+      gsap.set(navLogo, { opacity: 0 });
+      gsap.set(navLinks, { opacity: 0, x: 0 });
+      gsap.set(nav, { opacity: 1 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: hero,
           start: "top top",
-          end: "+=2500",
-          scrub: 1,
+          end: "+=9000",
+          scrub: 1.1,
           pin: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
-          onRefresh: measureTarget,
         },
       });
 
-      gsap.set(logo, { x: 0, y: 0, scale: 1, opacity: 1, transformPerspective: 1200 });
-      gsap.set(video, { scaleX: 1, scaleY: 1, opacity: 1 });
-      gsap.set(navLogo, { opacity: 0 });
-      gsap.set(navLinks, { x: 0, opacity: 0 });
-      gsap.set([taglineLeft, taglineRight], { x: 0, opacity: 0 });
-
-      const playLogoEntrance = () => {
-        if (cancelled) return;
-        gsap.fromTo(
-          logo,
-          { scale: 1.15, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.9, ease: "power3.out", overwrite: false }
-        );
-      };
-
-      const loadingScreen = document.querySelector(".loading-screen");
-      if (loadingScreen) {
-        gsap.set(logo, { scale: 1.15, opacity: 0 });
-        loadingObserver = new MutationObserver(() => {
-          if (!document.querySelector(".loading-screen")) {
-            loadingObserver.disconnect();
-            playLogoEntrance();
-          }
+      const syncWaveToDot = () => {
+        if (!hero || !dot || !wave) return;
+        const dotRect = dot.getBoundingClientRect();
+        const heroRect = hero.getBoundingClientRect();
+        gsap.set(wave, {
+          left: dotRect.left - heroRect.left,
+          top: dotRect.top - heroRect.top,
+          width: dotRect.width,
+          height: dotRect.height,
+          transformOrigin: "center center",
         });
-        loadingObserver.observe(document.body, { childList: true, subtree: true });
-      } else {
-        playLogoEntrance();
-      }
-
-      tl.to(
-        scrollIndicator,
-        { opacity: 0, ease: "none", duration: 0.12 },
-        0
-      )
-        .to(
-          video,
-          {
-            scaleX: 0.92,
-            scaleY: 0.62,
-            opacity: 0.9,
-            ease: "none",
-            duration: 0.3,
-          },
-          0.05
-        )
-        .to(
-          video,
-          {
-            scaleX: 0.78,
-            scaleY: 0.28,
-            opacity: 0.55,
-            ease: "none",
-            duration: 0.35,
-          },
-          0.3
-        )
-        .to(
-          video,
-          {
-            scaleX: 0.62,
-            scaleY: 0.08,
-            opacity: 0,
-            duration: 0.4,
-            ease: "none",
-          },
-          0.56
-        )
-        .to(
-          logo,
-          {
-            x: () => target.x,
-            y: () => target.y,
-            scale: () => target.scale,
-            transformPerspective: 1200,
-            duration: 0.72,
-            ease: "none",
-          },
-          0.22
-        )
-        .fromTo(
-          taglineLeft,
-          { x: "-35vw", opacity: 0 },
-          { x: 0, opacity: 1, ease: "none", duration: 0.38 },
-          0.42
-        )
-        .fromTo(
-          taglineRight,
-          { x: "35vw", opacity: 0 },
-          { x: 0, opacity: 1, ease: "none", duration: 0.38 },
-          0.42
-        )
-        .to(
-          navLinks,
-          { x: () => target.linksX, opacity: 1, duration: 0.65, ease: "none" },
-          0.25
-        )
-        .to(
-          logo,
-          { opacity: 0, duration: 0.06, ease: "none" },
-          0.94
-        )
-        .to(
-          navLogo,
-          { opacity: 1, duration: 0.06, ease: "none" },
-          0.94
-        );
-
-      const refreshTarget = () => {
-        window.clearTimeout(resizeTimer);
-        resizeTimer = window.setTimeout(() => {
-          measureTarget();
-          ScrollTrigger.refresh();
-        }, 120);
       };
 
-      measureTarget();
-      window.addEventListener("resize", refreshTarget);
-      window.addEventListener("orientationchange", refreshTarget);
+      const getSquareScale = () =>
+        Math.min(window.innerHeight * 0.3, window.innerWidth * 0.38) / dot.offsetHeight;
+      const getRectangleScaleX = () => (window.innerWidth * 0.48) / dot.offsetWidth;
+      syncWaveToDot();
+      tl.call(syncWaveToDot, [], 0)
+        .to(scrollIndicator, { opacity: 0, duration: 0.08, ease: "none" }, 0.03)
+        .to(left, { x: () => -window.innerWidth * 1.15, duration: 0.09, ease: "power2.in" }, 0.05)
+        .to(right, { x: () => window.innerWidth * 1.15, duration: 0.09, ease: "power2.in" }, 0.05)
+        .to(dot, { scaleX: getSquareScale, scaleY: getSquareScale, duration: 0.09, ease: "power2.inOut" }, 0.05)
+        .to(dot, { scaleX: getRectangleScaleX, scaleY: getSquareScale, duration: 0.05, ease: "power2.inOut" }, 0.14)
+        .to(dot, { scaleX: () => getRectangleScaleX() * 1.08, scaleY: () => getSquareScale() * 1.08, duration: 0.06, ease: "none" }, 0.19)
+        .to(dot, { opacity: 0, duration: 0.001, ease: "none" }, 0.31)
+        .to(wave, { "--wave-reveal": 0.18, "--wave-motion": 0.04, "--wave-intensity": 0.72, "--wave-density": 0.62, duration: 0.18, ease: "power1.inOut" }, 0.31)
+        .to(wave, { "--wave-reveal": 0.52, "--wave-motion": 0.22, "--wave-intensity": 0.92, "--wave-density": 0.78, duration: 0.2, ease: "power1.inOut" }, 0.49)
+        .to(wave, { "--wave-reveal": 0.82, "--wave-motion": 0.58, "--wave-intensity": 1.18, "--wave-density": 0.92, duration: 0.18, ease: "power1.inOut" }, 0.69)
+        .to(wave, { "--wave-reveal": 1, "--wave-motion": 0.92, "--wave-intensity": 1.38, "--wave-density": 1, duration: 0.14, ease: "power1.inOut" }, 0.87)
+        .to(wave, { scaleX: 1.3, duration: 0.16, ease: "power1.inOut" }, 1.01)
+        .to(wave, { "--wave-intensity": 1.52, duration: 0.12, ease: "power1.inOut" }, 1.09)
+        .to(wave, { scaleX: 1.55, scaleY: 1.12, duration: 0.16, ease: "power1.inOut" }, 1.17)
+        .to(wave, { scaleX: 2.1, scaleY: 1.6, duration: 0.22, ease: "power1.inOut" }, 1.35)
+        .to(navLinks, { opacity: 1, duration: 0.12, ease: "none" }, 1.72)
+        .to(navLogo, { opacity: 1, duration: 0.12, ease: "none" }, 1.76)
+        .to(wave, {
+          transformOrigin: "top center",
+          scaleY: 1.85,
+          opacity: 0.92,
+          filter: "brightness(0.82)",
+          duration: 0.28,
+          ease: "power2.out",
+        }, 1.78)
+        .to(wave, {
+          scaleY: 2.15,
+          opacity: 0.68,
+          filter: "brightness(0.55)",
+          duration: 0.32,
+          ease: "power2.inOut",
+        }, 2.06)
+        .to(wave, {
+          scaleY: 2.4,
+          opacity: 0.3,
+          filter: "brightness(0.25)",
+          duration: 0.32,
+          ease: "power2.inOut",
+        }, 2.38)
+        .to(wave, {
+          opacity: 0,
+          filter: "brightness(0.08)",
+          duration: 0.3,
+          ease: "power2.out",
+        }, 2.7)
+
+      .to(
+        tagline,
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.22,
+          ease: "power2.out",
+        },
+        3.05
+      )
+      .to(
+        tagline,
+        {
+          color: "#ff2a2a",
+          duration: 0.22,
+          ease: "power1.inOut",
+        },
+        3.28
+      );
+
+      tl.eventCallback("onUpdate", syncWaveToDot);
+
+      const refresh = () => {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(() => ScrollTrigger.refresh(), 140);
+      };
+
+      window.addEventListener("resize", refresh);
+      window.addEventListener("orientationchange", refresh);
       window.addEventListener("load", ScrollTrigger.refresh);
       document.fonts?.ready.then(() => {
-        if (cancelled) return;
-        measureTarget();
-        ScrollTrigger.refresh();
+        if (!cancelled) ScrollTrigger.refresh();
       });
 
       removeLayoutListeners = () => {
-        cancelled = true;
-        loadingObserver?.disconnect();
         window.clearTimeout(resizeTimer);
-        window.removeEventListener("resize", refreshTarget);
-        window.removeEventListener("orientationchange", refreshTarget);
+        window.removeEventListener("resize", refresh);
+        window.removeEventListener("orientationchange", refresh);
         window.removeEventListener("load", ScrollTrigger.refresh);
       };
     }, heroRef);
@@ -241,28 +191,19 @@ export default function Hero() {
 
   return (
     <section ref={heroRef} className="hero">
-      <div ref={landingReelRef} className="landing-reel">
-        <div ref={videoRef} className="video-container">
-          <video
-            src="/hero-video.mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/hero-poster.jpg"
-          />
-        </div>
+      <PixelWave waveRef={waveRef} canvasRef={waveCanvasRef} />
 
-        <div className="hero-content">
-          <h1 ref={logoRef} className="hero-logo">
-            DZAIND
-          </h1>
-        </div>
+      <div className="hero-content">
+        <h1 className="hero-logo hero-wordmark" aria-label="dzaind">
+          <span ref={leftRef} className="wm-left">dza</span>
+          <span ref={dotRef} className="wm-dot" aria-hidden="true" />
+          <span ref={rightRef} className="wm-right">nd</span>
+        </h1>
       </div>
 
       <p ref={taglineRef} className="hero-tagline">
-        <span ref={taglineLeftRef} className="tagline-left">LIVE TO</span>
-        <span ref={taglineRightRef} className="tagline-right">TELL THE TALE.</span>
+        <span>LIVE TO TELL</span>
+        <span>THE TALE</span>
       </p>
 
       <div ref={scrollIndicatorRef} className="scroll-indicator">SCROLL TO EXPLORE ↓</div>

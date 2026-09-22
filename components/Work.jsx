@@ -54,21 +54,30 @@ export default function Work() {
         const getScrollDistance = () =>
           Math.max(0, trackRef.current.scrollWidth - window.innerWidth * 0.7);
 
-        gsap.to(trackRef.current, {
-          x: () => -getScrollDistance(),
-          ease: "none",
-          scrollTrigger: {
+        gsap.fromTo(
+          trackRef.current,
+          { x: 0 },
+          {
+            x: () => -getScrollDistance(),
+            ease: "none",
+            immediateRender: false,
+            scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
             end: () => `+=${getScrollDistance()}`,
             scrub: 1.2,
             pin: true,
             invalidateOnRefresh: true,
-          },
-        });
+            },
+          }
+        );
 
         const refreshLayout = () => ScrollTrigger.refresh();
-        const handleResize = () => window.requestAnimationFrame(refreshLayout);
+        let resizeTimer;
+        const handleResize = () => {
+          window.clearTimeout(resizeTimer);
+          resizeTimer = window.setTimeout(refreshLayout, 120);
+        };
         const fontReady = document.fonts?.ready;
 
         window.addEventListener("resize", handleResize);
@@ -79,6 +88,7 @@ export default function Work() {
         removeLayoutListeners = () => {
           window.removeEventListener("resize", handleResize);
           window.removeEventListener("load", refreshLayout);
+          window.clearTimeout(resizeTimer);
         };
       }
 

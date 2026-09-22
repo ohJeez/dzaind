@@ -63,10 +63,6 @@ export default function PageTransition() {
         element.classList.add("is-visible");
         element.classList.add("section-loaded");
 
-        if (typeof window !== "undefined" && window.ScrollTrigger) {
-          window.ScrollTrigger.refresh();
-        }
-
         window.setTimeout(unlock, 500);
       }, 260);
 

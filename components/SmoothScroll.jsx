@@ -24,15 +24,19 @@ export default function SmoothScroll() {
     const frame = requestAnimationFrame(raf);
     lenis.on("scroll", ScrollTrigger.update);
 
-    const handleResize = () => ScrollTrigger.refresh();
+    let resizeTimer;
+    const handleResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => ScrollTrigger.refresh(), 120);
+    };
     window.addEventListener("resize", handleResize);
 
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", handleResize);
+      window.clearTimeout(resizeTimer);
       lenis.destroy();
       delete window.lenis;
-      ScrollTrigger.refresh();
     };
   }, []);
 

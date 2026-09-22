@@ -2,12 +2,11 @@
 
 import { useEffect, useRef } from "react";
 
-const PIXEL_COLORS = ["#ff2b1a", "#e52414", "#ff4535", "#b5120b"];
-const MAX_PIXELS = 12;
-const PIXEL_SPACING = 70;
+const MAX_PARTICLES = 42;
+const SPAWN_DISTANCE = 21;
 
 export default function PixelCursor() {
-  const layerRef = useRef(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -18,151 +17,106 @@ export default function PixelCursor() {
       return undefined;
     }
 
-    const layer = layerRef.current;
-    const heroSection = document.querySelector(".hero");
-    const heroLogo = document.querySelector(".hero-logo");
-    const aboutSection = document.getElementById("about");
-    const target = { x: 0, y: 0 };
-    const current = { x: 0, y: 0 };
-    const lastSpawn = { x: 0, y: 0, ready: false };
-    const pixels = [];
-    let animationFrame;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const current = { ...target };
+    const lastSpawn = { ...target };
+    const particles = [];
+    let hover = false;
+    let frame;
+    let lastTime = performance.now();
 
-    const isInsideSection = (section, x, y) => {
-      if (!section) return false;
-      const bounds = section.getBoundingClientRect();
-      return x >= bounds.left && x <= bounds.right && y >= bounds.top && y <= bounds.bottom;
+    const resize = () => {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * ratio;
+      canvas.height = window.innerHeight * ratio;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
     };
 
-    const isInsideHeroVisual = (x, y) => {
-      if (!heroLogo || !isInsideSection(heroSection, x, y)) return false;
-      const bounds = heroLogo.getBoundingClientRect();
-      const horizontalPadding = Math.max(40, bounds.width * 0.18);
-      const verticalPadding = Math.max(36, bounds.height * 1.6);
-      return (
-        x >= bounds.left - horizontalPadding &&
-        x <= bounds.right + horizontalPadding &&
-        y >= bounds.top - verticalPadding &&
-        y <= bounds.bottom + verticalPadding
-      );
-    };
-
-    const isInsideActiveSection = (x, y) => {
-      const insideAbout = isInsideSection(aboutSection, x, y);
-      const insideHero = isInsideSection(heroSection, x, y);
-      return insideAbout || (insideHero && !isInsideHeroVisual(x, y));
-    };
-
-    const clearPixels = () => {
-      pixels.forEach((pixel) => pixel.element.remove());
-      pixels.length = 0;
-      lastSpawn.ready = false;
-    };
-
-    const removePixel = (pixel) => {
-      const index = pixels.indexOf(pixel);
-      if (index !== -1) pixels.splice(index, 1);
-      pixel.element.remove();
-    };
-
-    const spawnPixel = (x, y) => {
-      if (pixels.length >= MAX_PIXELS) removePixel(pixels[0]);
-
-      const element = document.createElement("span");
-      const width = 40 + Math.random() * 20;
-      const height = Math.random() > 0.86 ? 36 + Math.random() * 18 : width;
-      const pixel = {
-        element,
-        x,
-        y,
-        driftX: (Math.random() - 0.5) * 0.015,
-        driftY: (Math.random() - 0.5) * 0.015,
-        born: performance.now(),
-        life: 600 + Math.random() * 250,
-      };
-
-      element.className = "pixel-cursor-particle";
-      element.style.width = `${width}px`;
-      element.style.height = `${height}px`;
-      element.style.opacity = `${0.2 + Math.random() * 0.1}`;
-      element.style.backgroundColor = PIXEL_COLORS[Math.floor(Math.random() * PIXEL_COLORS.length)];
-      element.style.transform = `translate3d(${x - width / 2}px, ${y - height / 2}px, 0) rotate(${Math.random() * 16 - 8}deg)`;
-      layer.appendChild(element);
-      pixels.push(pixel);
+    const spawn = (count, now) => {
+      for (let index = 0; index < count && particles.length < MAX_PARTICLES; index += 1) {
+        particles.push({
+          x: current.x,
+          y: current.y,
+          size: 2 + Math.random() * 2,
+          velocityX: (Math.random() - 0.5) * 1.8,
+          velocityY: (Math.random() - 0.5) * 1.8,
+          born: now,
+          life: 320 + Math.random() * 140,
+        });
+      }
     };
 
     const handlePointerMove = (event) => {
       target.x = event.clientX;
       target.y = event.clientY;
-
-      if (!isInsideActiveSection(target.x, target.y)) {
-        clearPixels();
-        return;
-      }
-
-      if (!lastSpawn.ready) {
-        current.x = target.x;
-        current.y = target.y;
-        lastSpawn.x = target.x;
-        lastSpawn.y = target.y;
-        lastSpawn.ready = true;
-        spawnPixel(current.x, current.y);
-        return;
-      }
+      hover = Boolean(event.target.closest?.("a, button, [data-cursor-hover]"));
     };
 
-    const handleScroll = () => {
-      if (lastSpawn.ready && !isInsideActiveSection(target.x, target.y)) clearPixels();
+    const handlePointerLeave = () => {
+      hover = false;
     };
 
     const animate = (now) => {
-      if (lastSpawn.ready && !isInsideActiveSection(target.x, target.y)) clearPixels();
+      const delta = Math.min(2, (now - lastTime) / 16.67);
+      lastTime = now;
+      current.x += (target.x - current.x) * 0.24;
+      current.y += (target.y - current.y) * 0.24;
 
-      if (lastSpawn.ready) {
-        current.x += (target.x - current.x) * 0.24;
-        current.y += (target.y - current.y) * 0.24;
-
-        if (Math.hypot(current.x - lastSpawn.x, current.y - lastSpawn.y) >= PIXEL_SPACING) {
-          spawnPixel(current.x, current.y);
-          lastSpawn.x = current.x;
-          lastSpawn.y = current.y;
-        }
+      const distance = Math.hypot(current.x - lastSpawn.x, current.y - lastSpawn.y);
+      if (distance >= SPAWN_DISTANCE) {
+        spawn(hover ? 2 + Math.floor(Math.random() * 2) : 1 + Math.floor(Math.random() * 2), now);
+        lastSpawn.x = current.x;
+        lastSpawn.y = current.y;
       }
 
-      for (let index = pixels.length - 1; index >= 0; index -= 1) {
-        const pixel = pixels[index];
-        const progress = (now - pixel.born) / pixel.life;
-
+      context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      for (let index = particles.length - 1; index >= 0; index -= 1) {
+        const particle = particles[index];
+        const progress = (now - particle.born) / particle.life;
         if (progress >= 1) {
-          removePixel(pixel);
+          particles.splice(index, 1);
           continue;
         }
-
-        pixel.x += pixel.driftX;
-        pixel.y += pixel.driftY;
+        particle.x += particle.velocityX * delta;
+        particle.y += particle.velocityY * delta;
         const fade = 1 - progress;
-        pixel.element.style.opacity = `${fade * fade * 0.3}`;
-        pixel.element.style.scale = `${0.72 + fade * 0.28}`;
-        pixel.element.style.translate = `${pixel.x - pixel.element.offsetWidth / 2}px ${pixel.y - pixel.element.offsetHeight / 2}px`;
+        context.globalAlpha = fade * fade * 0.65;
+        context.fillStyle = "#ff2a2a";
+        context.fillRect(particle.x - particle.size / 2, particle.y - particle.size / 2, particle.size, particle.size);
       }
 
-      animationFrame = requestAnimationFrame(animate);
+      context.globalAlpha = hover ? 0.9 : 0.68;
+      context.strokeStyle = "#ff2a2a";
+      context.lineWidth = 1;
+      context.beginPath();
+      context.arc(current.x, current.y, hover ? 14 : 10, 0, Math.PI * 2);
+      context.stroke();
+      context.globalAlpha = 1;
+      context.fillStyle = "#ff2a2a";
+      context.fillRect(current.x - 2, current.y - 2, 4, 4);
+      frame = requestAnimationFrame(animate);
     };
 
-    window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    animationFrame = requestAnimationFrame(animate);
+    resize();
+    document.body.classList.add("has-custom-cursor");
+    window.addEventListener("resize", resize);
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("pointerleave", handlePointerLeave);
+    frame = requestAnimationFrame(animate);
 
     return () => {
+      document.body.classList.remove("has-custom-cursor");
+      window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("scroll", handleScroll);
-      cancelAnimationFrame(animationFrame);
-      pixels.forEach((pixel) => pixel.element.remove());
+      window.removeEventListener("pointerleave", handlePointerLeave);
+      cancelAnimationFrame(frame);
+      particles.length = 0;
     };
   }, []);
 
-  return (
-    <div className="pixel-cursor-layer" ref={layerRef} aria-hidden="true">
-    </div>
-  );
+  return <canvas className="cursor-canvas" ref={canvasRef} aria-hidden="true" />;
 }
