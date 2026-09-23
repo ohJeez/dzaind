@@ -54,7 +54,7 @@ export default function LoadingScreen() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
           >
-            <span className="loading-logo">DZAIND</span>
+            <span className="loading-logo">dzaind</span>
             <span className="loading-progress" aria-live="polite">{progress}%</span>
             <span className="loading-line" aria-hidden="true" />
           </motion.div>

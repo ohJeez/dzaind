@@ -70,11 +70,13 @@ export default function Navbar() {
       <nav ref={navRef} className="navbar" data-navbar="true" aria-label="Main navigation">
         <Link
           href="/"
-          className="nav-logo nav-logo-target"
+          className="nav-logo nav-brand nav-logo-target"
           data-navbar-logo-target="true"
-          aria-label="DZAIND home"
+          aria-label="dzaind by zainul abid"
         >
-          DZAIND
+          <span className="nav-brand-main">dzaind</span>
+          <span className="nav-brand-by">by</span>
+          <span className="nav-brand-name">zainul abid</span>
         </Link>
 
         <div className="nav-links desktop-nav" data-navbar-links="true">

@@ -2,7 +2,7 @@ export default function Footer() {
   return (
     <footer data-section="footer" className="site-footer section-shell">
       <div className="footer-brand-block">
-        <p className="footer-brand">DZAIND</p>
+        <p className="footer-brand">dzaind</p>
         <p className="footer-tagline">LIVE TO TELL THE TALE.</p>
       </div>
 

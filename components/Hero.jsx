@@ -14,6 +14,7 @@ export default function Hero() {
   const leftRef = useRef(null);
   const rightRef = useRef(null);
   const dotRef = useRef(null);
+  const stemRef = useRef(null);
   const taglineRef = useRef(null);
   const scrollIndicatorRef = useRef(null);
 
@@ -23,6 +24,7 @@ export default function Hero() {
     const waveCanvas = waveCanvasRef.current;
     const left = leftRef.current;
     const right = rightRef.current;
+    const stem = stemRef.current;
     const dot = dotRef.current;
     const tagline = taglineRef.current;
     const scrollIndicator = scrollIndicatorRef.current;
@@ -95,6 +97,7 @@ export default function Hero() {
         .to(scrollIndicator, { opacity: 0, duration: 0.08, ease: "none" }, 0.03)
         .to(left, { x: () => -window.innerWidth * 1.15, duration: 0.09, ease: "power2.in" }, 0.05)
         .to(right, { x: () => window.innerWidth * 1.15, duration: 0.09, ease: "power2.in" }, 0.05)
+        .to(stem, { opacity: 0, duration: 0.05, ease: "none" }, 0.05)
         .to(dot, { scaleX: getSquareScale, scaleY: getSquareScale, duration: 0.09, ease: "power2.inOut" }, 0.05)
         .to(dot, { scaleX: getRectangleScaleX, scaleY: getSquareScale, duration: 0.05, ease: "power2.inOut" }, 0.14)
         .to(dot, { scaleX: () => getRectangleScaleX() * 1.08, scaleY: () => getSquareScale() * 1.08, duration: 0.06, ease: "none" }, 0.19)
@@ -152,8 +155,8 @@ export default function Hero() {
         tagline,
         {
           color: "#ff2a2a",
-          duration: 0.22,
-          ease: "power1.inOut",
+          duration: 0.08,
+          ease: "none",
         },
         3.28
       );
@@ -191,21 +194,38 @@ export default function Hero() {
   return (
     <section ref={heroRef} className="hero">
       <PixelWave waveRef={waveRef} canvasRef={waveCanvasRef} />
-
+    
       <div className="hero-content">
-        <h1 className="hero-logo hero-wordmark" aria-label="dzaind">
-          <span ref={leftRef} className="wm-left">dza</span>
-          <span ref={dotRef} className="wm-dot" aria-hidden="true" />
-          <span ref={rightRef} className="wm-right">nd</span>
-        </h1>
+        <h1
+          className="hero-logo hero-wordmark"
+          aria-label="dzaind"
+        >
+          <span ref={leftRef} className="wm-left">
+            dza
+          </span>
+          
+            <span className="wm-i" aria-hidden="true">
+              <span ref={stemRef} className="wm-i-stem" />
+              <span ref={dotRef} className="wm-i-dot" />
+            </span>
+          
+          <span ref={rightRef} className="wm-right">
+            nd
+          </span>
+</h1>
       </div>
-
+    
       <p ref={taglineRef} className="hero-tagline">
         <span>LIVE TO TELL</span>
         <span>THE TALE</span>
       </p>
-
-      <div ref={scrollIndicatorRef} className="scroll-indicator">SCROLL TO EXPLORE ↓</div>
+    
+      <div
+        ref={scrollIndicatorRef}
+        className="scroll-indicator"
+      >
+        SCROLL TO EXPLORE ↓
+      </div>
     </section>
   );
 }

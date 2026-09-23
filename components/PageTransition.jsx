@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 export default function PageTransition() {
   const [active, setActive] = useState(false);
-  const [label, setLabel] = useState("DZAIND");
+  const [label, setLabel] = useState("dzaind");
   const activeRef = useRef(false);
   const timersRef = useRef(new Set());
 
@@ -39,7 +39,7 @@ export default function PageTransition() {
       }
 
       activeRef.current = true;
-      setLabel(nextLabel || selector.toUpperCase());
+      setLabel(nextLabel || selector.toLowerCase());
       setActive(true);
 
       const lenis = window.lenis;
@@ -96,7 +96,7 @@ export default function PageTransition() {
 
     const handleNavigate = (event) => {
       const nextTarget = event?.detail?.target || event?.detail?.section;
-      const nextLabel = event?.detail?.label || "DZAIND";
+      const nextLabel = event?.detail?.label || "dzaind";
       triggerTransition(nextTarget, nextLabel);
     };
 
@@ -162,7 +162,7 @@ export default function PageTransition() {
             exit={{ y: -10, opacity: 0, scale: 0.99 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span className="transition-brand">DZAIND</span>
+            <span className="transition-brand">dzaind</span>
             <span className="transition-label">{label}</span>
           </motion.div>
         </motion.div>

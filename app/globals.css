@@ -1,3 +1,10 @@
+@font-face {
+  font-family: "DZAIND-MONT";
+  src: url("/fonts/Mont-HeavyDEMO.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
 :root {
   --bg: #000000;
   --bg-soft: #0b0b0b;
@@ -59,12 +66,15 @@ body {
 }
 
 .transition-brand {
+  font-family: "DZAIND-MONT", sans-serif;
   font-size: clamp(1rem, 2vw, 1.25rem);
   letter-spacing: 0.28em;
   color: rgba(255, 255, 255, 0.8);
 }
 
 .transition-label {
+  font-family: "DZAIND-MONT", sans-serif;
+  font-weight: 800;
   font-size: clamp(2.6rem, 7vw, 6.5rem);
   letter-spacing: -0.08em;
   line-height: 0.9;
@@ -164,11 +174,47 @@ main.page-shell {
 .nav-logo {
   position: relative;
   z-index: 2;
-  font-size: clamp(1.1rem, 1vw + 0.7rem, 1.5rem);
-  font-weight: 700;
-  letter-spacing: -0.08em;
+  font-family: "DZAIND-MONT", sans-serif;
+  font-size: clamp(1rem, 0.85vw + 0.65rem, 1.25rem);
+  font-weight: 900;
+  letter-spacing: -0.06em;
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
+}
+
+.nav-brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.34em;
+  min-width: max-content;
+  font-family: "DZAIND-MONT", sans-serif;
+  color: var(--text);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.nav-brand-main {
+  font-size: clamp(0.95rem, 0.72vw + 0.62rem, 1.2rem);
+  font-weight: 900;
+  letter-spacing: -0.065em;
+}
+
+.nav-brand-by {
+  font-family: "DZAIND-MONT", sans-serif;
+  font-size: clamp(0.42rem, 0.28vw + 0.3rem, 0.56rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.62);
+  text-transform: lowercase;
+}
+
+.nav-brand-name {
+  font-family: "DZAIND-MONT", sans-serif;
+  font-size: clamp(0.47rem, 0.32vw + 0.32rem, 0.62rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: lowercase;
 }
 
 .nav-logo-target {
@@ -337,43 +383,76 @@ main.page-shell {
 }
 
 .hero-logo {
-  position: relative;
-  z-index: 3;
-  font-size: clamp(100px, 18vw, 300px);
-  font-family: "Avenir Next Rounded", "Arial Rounded MT Bold", "Trebuchet MS", sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-family: "DZAIND-MONT", sans-serif;
   font-weight: 900;
-  letter-spacing: -0.08em;
-  line-height: 0.78;
-  text-align: center;
+  font-size: clamp(120px, 17vw, 310px);
+  line-height: 0.68;
+  letter-spacing: -0.105em;
+  color: #ffffff;
   white-space: nowrap;
-  transform-origin: center;
-  will-change: transform, opacity;
-  color: #fff;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .hero-wordmark {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   justify-content: center;
-  gap: 0.06em;
+  position: relative;
+  gap: 0;
+  transform-origin: center center;
 }
 
 .wm-left,
 .wm-right {
   display: inline-block;
-  will-change: transform, opacity;
+  font-family: "DZAIND-MONT", sans-serif;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 0.68;
+  letter-spacing: -0.095em;
 }
 
-.wm-dot {
-  display: inline-block;
-  width: 0.18em;
-  height: 0.18em;
-  margin-top: 0.12em;
-  flex: 0 0 auto;
-  background: var(--accent);
-  transform-origin: center;
-  will-change: transform, opacity;
+.wm-left {
+  transform-origin: right center;
 }
+
+.wm-right {
+  transform-origin: left center;
+}
+
+/* Geometric red connector between "a" and "n" */
+.wm-i {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+
+  /* controls the gap between a and n */
+  width: 0.23em;
+  height: 0.68em;
+
+  margin-left: 0;
+  margin-right: 0;
+
+  transform-origin: center center;
+  z-index: 3;
+}
+.wm-i-dot {
+  position: absolute;
+  left: 72%;
+  top: -0.14em;               /* clear gap above the stem, near the d/ascender height */
+  transform: translateX(-50%);
+  width: 0.25em;
+  height: 0.25em;
+  background: #ed1c24;
+  transform-origin: center center;
+}
+
 
 .hero-tagline {
   position: absolute;
@@ -743,7 +822,9 @@ main.page-shell {
 }
 
 .footer-brand {
-  font-weight: 700;
+  font-family: "DZAIND-MONT", sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.04em;
 }
 
 .footer-tagline {
@@ -794,10 +875,11 @@ main.page-shell {
 }
 
 .loading-logo {
+  font-family: "MONT", Inter, "Helvetica Neue", Arial, sans-serif;
   font-size: clamp(2.2rem, 5vw, 5.5rem);
   letter-spacing: -0.08em;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 900;
+  text-transform: lowercase;
 }
 
 .loading-progress {
@@ -865,7 +947,7 @@ main.page-shell {
   }
 
   .hero-wordmark {
-    gap: 0.08em;
+    gap: 0;
   }
 
   .hero-tagline {
